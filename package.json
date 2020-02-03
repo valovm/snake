@@ -11,8 +11,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --mode=development --hot=true",
-    "start": "webpack --mode=development"
+    "build": "webpack --mode=development",
+    "start": "webpack --mode=development  --hot=true"
   },
   "author": "",
   "license": "ISC"

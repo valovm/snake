@@ -1,3 +1,5 @@
+import {Callback} from "./callback";
+
 class SnakeCell {
   constructor(
     private _x: number,
@@ -27,6 +29,8 @@ export class Snake {
   private _cells: SnakeCell[] = [];
   private _head: SnakeCell;
 
+  private _callbacks: Callback[] = [];
+
   constructor(x: number, y: number) {
     this.cells.push(new SnakeCell(x, y));
     this._head = this.cells[0];
@@ -48,8 +52,8 @@ export class Snake {
       case "UP": y--; break;
       case "DOWN": y++; break;
     }
-
     this._head.setXy(x, y);
+    this.emit('move');
   }
 
   addCells(count?: number){
@@ -62,5 +66,15 @@ export class Snake {
 
   x(): number { return this._head.x };
   y(): number { return this._head.y };
+
+  on(callback: Callback){
+      this._callbacks.push(callback);
+  };
+
+  private emit(eventName: string){
+      this._callbacks
+          .filter(item => item.name === eventName)
+          .forEach(item => item.callback());
+  }
 
 }
