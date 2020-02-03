@@ -4,23 +4,15 @@ class SnakeCell {
   constructor(
     private _x: number,
     private _y: number,
-    private _next?: SnakeCell
   ){}
 
   setXy(x: number, y: number){
-    if( this._next){
-      this._next.setXy(this._x, this._y);
-    }
     this._x = x;
     this._y = y;
   }
 
   get x():number { return this._x };
   get y():number { return this._y };
-
-  set next(cell: SnakeCell){
-    this._next = cell;
-  }
 }
 
 
@@ -40,9 +32,7 @@ export class Snake {
     return this._cells;
   }
 
-  set dir(dir: "RIGHT" | "LEFT" | "UP" | "DOWN"){
-    this._dir = dir;
-  }
+  set dir(dir: "RIGHT" | "LEFT" | "UP" | "DOWN"){ this._dir = dir;}
 
   move(){
     let x = this._head.x, y = this._head.y;
@@ -52,20 +42,49 @@ export class Snake {
       case "UP": y--; break;
       case "DOWN": y++; break;
     }
-    this._head.setXy(x, y);
+
+    for(let i = this._cells.length - 1; i > 0; i--){
+        const cell = this._cells[i];
+        cell.setXy(this._cells[i-1].x, this._cells[i-1].y)
+    }
+    this._cells[0].setXy(x, y)
+
     this.emit('move');
+    if( this.checkItMySelf() ){ this.emit('eatMyself'); }
   }
 
   addCells(count?: number){
     const endCell = this.cells[this.cells.length -1];
     const cell = new SnakeCell(endCell.x, endCell.y);
-    endCell.next = cell;
     this.move();
     this.cells.push(cell);
   }
 
   x(): number { return this._head.x };
   y(): number { return this._head.y };
+
+  reverse(){
+      this._cells.reverse();
+      this._head = this._cells[0];
+      this.reverseDir();
+
+  }
+
+  private reverseDir(){
+      switch (this._dir) {
+          case "RIGHT": this.dir = "LEFT"; break;
+          case "LEFT": this.dir = "RIGHT"; break;
+          case "UP": this.dir = "DOWN"; break;
+          case "DOWN": this.dir = "UP"; break;
+      }
+  }
+
+  private checkItMySelf(){
+      const head = this._head;
+      const cell = this._cells.find(item => item !== head && item.x === head.x && item.y === head.y );
+      if(cell){ return true; }
+      return false;
+  }
 
   on(callback: Callback){
       this._callbacks.push(callback);

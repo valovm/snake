@@ -4,7 +4,8 @@ const canvas = document.getElementById('game-snake');
 const context = canvas.getContext('2d');
 
 const game = new Game();
-game.start();
+game.newGame();
+
 
 document.addEventListener('keydown', function(e) {
     const keys = [
