@@ -46,17 +46,19 @@ export class Game {
         this._gameArea.h = h;
         this._gameArea.w = w;
     }
+    get gameArea() { return this._gameArea; }
 
     newGame() {
         const coords = this.randomCoords();
         this._snake = new Snake(coords.x, coords.y);
         this._snake.on({name: 'move', callback: () => {
-            this.wallContact();
+            this.snakeContactWall();
             this.snakeEatFood();
         }});
         this._snake.on({name: 'eatMyself', callback: () => { this.gameOver() } });
         this.addFood();
-
+    }
+    start(){
         this._timer = setInterval(() => { this._snake.move(); }, this._speed );
     }
 
@@ -71,7 +73,12 @@ export class Game {
         clearInterval(this._timer);
     }
 
-    private wallContact(){
+    private addFood(){
+        const coords = this.randomCoords();
+        this._food.push(this._foodService.getFood(coords.x, coords.y));
+    }
+
+    private snakeContactWall(){
         const x = this._snake.x() * this._size,
               y = this._snake.y() * this._size;
         if (x < 0 || x >= this._gameArea.w || y < 0 || y >= this._gameArea.h ){
@@ -88,12 +95,6 @@ export class Game {
             this._food.splice(index, 1);
             setTimeout(() => this.addFood() , this.randomFoodTimeout() );
         }
-    }
-
-
-    private addFood(){
-        const coords = this.randomCoords();
-        this._food.push(this._foodService.getFood(coords.x, coords.y));
     }
 
     private randomCoords(){

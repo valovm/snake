@@ -5,7 +5,7 @@ const context = canvas.getContext('2d');
 
 const game = new Game();
 game.newGame();
-
+game.start();
 
 document.addEventListener('keydown', function(e) {
     const keys = [
@@ -20,13 +20,22 @@ document.addEventListener('keydown', function(e) {
 
 
 function render() {
-    context.clearRect(0,0, 800, 800);
+    context.clearRect(0,0, game.gameArea.w, game.gameArea.h);
 
+    snakeRender();
+    foodRender();
+
+    window.requestAnimationFrame(render);
+}
+
+function snakeRender(){
     context.strokeStyle = "green";
     game.snake.cells.forEach(point => {
         context.strokeRect(point.x * game.size, point.y * game.size, game.size, game.size)
     });
+}
 
+function foodRender(){
     game.food.forEach(item => {
         context.fillStyle = item.color;
         switch (item.shape) {
@@ -35,15 +44,13 @@ function render() {
                 break;
             case 'circle':
                 const r = game.size/2;
-                context.beginPath()
+                context.beginPath();
                 context.arc(item.x * game.size + r, item.y * game.size + r, r, 0, 2 * Math.PI, false);
                 context.fillStyle = 'circle';
                 context.fill();
-            break;
+                break;
         }
     });
-
-    window.requestAnimationFrame(render);
 }
 
 
