@@ -1,4 +1,4 @@
-import {Apple} from "./apple";
+import {Food, FoodService} from "./foods";
 import {Snake} from "./snake";
 import {getRandomInt} from "./heplers";
 
@@ -16,10 +16,12 @@ export class Game {
         this._settings = {...settings, ...this._settings};
         this.setGameArea(this._settings.gameArea.w, this._settings.gameArea.h );
         this._size = this._settings.size;
+        this._foodService = new FoodService();
     }
 
     private  _snake: Snake;
-    private _food: Apple[] = [];
+    private _food: Food[] = [];
+    private _foodService: FoodService;
 
     private _score: number = 0;
     private _try: number = 0;
@@ -36,7 +38,7 @@ export class Game {
     };
 
     get snake(): Snake { return this._snake };
-    get food(): Apple[] { return this._food };
+    get food(): Food[] { return this._food };
     get score(): number { return this._score };
     get size(): number { return this._size }
 
@@ -80,9 +82,10 @@ export class Game {
     private snakeEatFood(){
         const index = this._food.findIndex(item => item.x == this._snake.x() && item.y == this._snake.y());
         if(index >-1){
-            this.food.splice(index, 1);
-            this.snake.addCells();
-            this._score += 1;
+            const food = this._food[index];
+            this.snake.eat(food);
+            this._score += food.count;
+            this._food.splice(index, 1);
             setTimeout(() => this.addFood() , this.randomFoodTimeout() );
         }
     }
@@ -90,7 +93,7 @@ export class Game {
 
     private addFood(){
         const coords = this.randomCoords();
-        this._food.push(new Apple(coords.x, coords.y));
+        this._food.push(this._foodService.getFood(coords.x, coords.y));
     }
 
     private randomCoords(){

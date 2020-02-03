@@ -27,8 +27,21 @@ function render() {
         context.strokeRect(point.x * game.size, point.y * game.size, game.size, game.size)
     });
 
-    context.fillStyle = 'red';
-    game.food.forEach(item => context.fillRect(item.x * game.size, item.y * game.size, game.size, game.size));
+    game.food.forEach(item => {
+        context.fillStyle = item.color;
+        switch (item.shape) {
+            case 'square':
+                context.fillRect(item.x * game.size, item.y * game.size, game.size, game.size);
+                break;
+            case 'circle':
+                const r = game.size/2;
+                context.beginPath()
+                context.arc(item.x * game.size + r, item.y * game.size + r, r, 0, 2 * Math.PI, false);
+                context.fillStyle = 'circle';
+                context.fill();
+            break;
+        }
+    });
 
     window.requestAnimationFrame(render);
 }

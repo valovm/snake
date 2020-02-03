@@ -1,4 +1,5 @@
 import {Callback} from "./callback";
+import {Food} from "./foods";
 
 class SnakeCell {
   constructor(
@@ -53,11 +54,13 @@ export class Snake {
     if( this.checkItMySelf() ){ this.emit('eatMyself'); }
   }
 
-  addCells(count?: number){
-    const endCell = this.cells[this.cells.length -1];
-    const cell = new SnakeCell(endCell.x, endCell.y);
-    this.move();
-    this.cells.push(cell);
+  eat(food: Food){
+     for(let i = 0; i < food.count; i++) {
+         const endCell = this.cells[this.cells.length -1];
+         const cell = new SnakeCell(endCell.x, endCell.y);
+         this.move();
+         this.cells.push(cell);
+     }
   }
 
   x(): number { return this._head.x };
