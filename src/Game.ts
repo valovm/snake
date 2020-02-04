@@ -80,6 +80,7 @@ export class Game {
     }
 
     private gameOver(){
+
         clearInterval(this._timer);
     }
 
@@ -101,7 +102,7 @@ export class Game {
         if(index >-1){
             const food = this._food[index];
             this.snake.eat(food);
-            this._score += food.count;
+            this._score += food.score;
             this._food.splice(index, 1);
             setTimeout(() => this.addFood() , this.randomFoodTimeout() );
         }
