@@ -1,5 +1,5 @@
 import {Callback} from "./callback";
-import {Food} from "./foods";
+import {Food} from "./Foods";
 
 class SnakeCell {
   constructor(
@@ -18,7 +18,7 @@ class SnakeCell {
 
 
 export class Snake {
-  private _dir: "RIGHT" | "LEFT" | "UP" | "DOWN" = "RIGHT";
+  private _dir: 'RIGHT' | 'LEFT' | 'UP' | 'DOWN' = 'RIGHT';
   private _cells: SnakeCell[] = [];
   private _head: SnakeCell;
 
@@ -33,7 +33,7 @@ export class Snake {
     return this._cells;
   }
 
-  set dir(dir: "RIGHT" | "LEFT" | "UP" | "DOWN"){ this._dir = dir;}
+  set dir(dir: 'RIGHT' | 'LEFT' | 'UP' | 'DOWN'){ this._dir = dir;}
 
   move(){
     let x = this._head.x, y = this._head.y;

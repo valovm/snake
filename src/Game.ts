@@ -1,7 +1,7 @@
-import {Food, FoodService} from "./foods";
-import {Snake} from "./snake";
+import {Food, FoodService} from "./Foods";
+import {Snake} from "./Snake";
 import {getRandomInt} from "./heplers";
-
+import {CanvasRenderServiceImpl, RenderService} from "./RenderService";
 
 interface GameSettings {
    maxTry: number;
@@ -11,13 +11,20 @@ interface GameSettings {
 }
 
 export class Game {
+    constructor(el: HTMLCanvasElement, settings?: GameSettings) {
+        this._el = el;
 
-    constructor(settings?: GameSettings) {
         this._settings = {...settings, ...this._settings};
         this.setGameArea(this._settings.gameArea.w, this._settings.gameArea.h );
         this._size = this._settings.size;
+
         this._foodService = new FoodService();
+
+        this._render = new CanvasRenderServiceImpl(el, this);
+        this._render.render();
     }
+    private  _el: Element;
+    private  _render: RenderService;
 
     private  _snake: Snake;
     private _food: Food[] = [];
@@ -57,8 +64,10 @@ export class Game {
         }});
         this._snake.on({name: 'eatMyself', callback: () => { this.gameOver() } });
         this.addFood();
+
     }
     start(){
+        window.addEventListener('keydown', (e: KeyboardEvent) => this.arrowControls(e) );
         this._timer = setInterval(() => { this._snake.move(); }, this._speed );
     }
 
@@ -67,6 +76,7 @@ export class Game {
         this._food = [];
         this._try++;
         this.newGame();
+        this.start();
     }
 
     private gameOver(){
@@ -108,6 +118,22 @@ export class Game {
     private randomFoodTimeout(){
         return getRandomInt(this._settings.foodTimeout.max, this._settings.foodTimeout.min) * 1000;
     }
+
+    arrowControls(e: KeyboardEvent){
+        const keys = [
+            { codes: [65, 37], dir: 'LEFT' },
+            { codes: [87, 38], dir: 'UP' },
+            { codes: [68, 39], dir: 'RIGHT' },
+            { codes: [83, 40], dir: 'DOWN' },
+        ];
+        const key = keys.find( key => key.codes.includes(e.keyCode));
+        if( key ) {
+            // @ts-ignore
+            this._snake.dir = key.dir;
+            this._snake.move() }
+    }
+
+
 }
 
 
