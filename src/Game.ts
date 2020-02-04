@@ -12,8 +12,6 @@ interface GameSettings {
 
 export class Game {
     constructor(el: HTMLCanvasElement, settings?: GameSettings) {
-        this._el = el;
-
         this._settings = {...settings, ...this._settings};
         this.setGameArea(this._settings.gameArea.w, this._settings.gameArea.h );
         this._size = this._settings.size;
@@ -22,14 +20,17 @@ export class Game {
 
         this._render = new CanvasRenderServiceImpl(el, this);
         this._render.render();
+
+        window.addEventListener('keydown', (e: KeyboardEvent) => this.arrowControls(e) );
     }
-    private  _el: Element;
+
     private  _render: RenderService;
 
     private  _snake: Snake;
     private _food: Food[] = [];
     private _foodService: FoodService;
 
+    private _state: 'stop' | 'pause' | 'play' = 'stop';
     private _score: number = 0;
     private _try: number = 0;
     private _speed: number = 200;
@@ -49,11 +50,11 @@ export class Game {
     get score(): number { return this._score };
     get size(): number { return this._size }
 
-    setGameArea(w: number, h: number) {
+    get gameArea() { return this._gameArea; }
+    private setGameArea(w: number, h: number) {
         this._gameArea.h = h;
         this._gameArea.w = w;
     }
-    get gameArea() { return this._gameArea; }
 
     newGame() {
         const coords = this.randomCoords();
@@ -67,7 +68,7 @@ export class Game {
 
     }
     start(){
-        window.addEventListener('keydown', (e: KeyboardEvent) => this.arrowControls(e) );
+        this._state = 'play';
         this._timer = setInterval(() => { this._snake.move(); }, this._speed );
     }
 
@@ -80,7 +81,7 @@ export class Game {
     }
 
     private gameOver(){
-
+        this._state = 'stop';
         clearInterval(this._timer);
     }
 
@@ -128,7 +129,7 @@ export class Game {
             { codes: [83, 40], dir: 'DOWN' },
         ];
         const key = keys.find( key => key.codes.includes(e.keyCode));
-        if( key ) {
+        if( key  && this._state == 'play') {
             // @ts-ignore
             this._snake.dir = key.dir;
             this._snake.move() }
