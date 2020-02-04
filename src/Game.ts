@@ -30,7 +30,7 @@ export class Game {
     private _food: Food[] = [];
     private _foodService: FoodService;
 
-    private _state: 'stop' | 'pause' | 'play' = 'stop';
+    private _state: 'stop' | 'play' = 'stop';
     private _score: number = 0;
     private _try: number = 0;
     private _speed: number = 200;
@@ -57,6 +57,7 @@ export class Game {
     }
 
     newGame() {
+        this._food = [];
         const coords = this.randomCoords();
         this._snake = new Snake(coords.x, coords.y);
         this._snake.on({name: 'move', callback: () => {
@@ -68,13 +69,13 @@ export class Game {
 
     }
     start(){
-        this._state = 'play';
-        this._timer = setInterval(() => { this._snake.move(); }, this._speed );
+        if (this._state != 'play'){
+            this._state = 'play';
+            this._timer = setInterval(() => { this._snake.move(); }, this._speed );
+        }
     }
-
     restart(){
         if(this._try > this._settings.maxTry) { return false ;}
-        this._food = [];
         this._try++;
         this.newGame();
         this.start();
@@ -121,7 +122,7 @@ export class Game {
         return getRandomInt(this._settings.foodTimeout.max, this._settings.foodTimeout.min) * 1000;
     }
 
-    arrowControls(e: KeyboardEvent){
+    private arrowControls(e: KeyboardEvent){
         const keys = [
             { codes: [65, 37], dir: 'LEFT' },
             { codes: [87, 38], dir: 'UP' },
