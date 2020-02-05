@@ -1,5 +1,6 @@
 import {Callback} from "./callback";
 import {Food} from "./Foods";
+import {reverseSide, Sides} from "./heplers";
 
 class SnakeCell {
   constructor(
@@ -18,7 +19,7 @@ class SnakeCell {
 
 
 export class Snake {
-  private _dir: 'RIGHT' | 'LEFT' | 'UP' | 'DOWN' = 'RIGHT';
+  private _dir: Sides = Sides.right;
   private _cells: SnakeCell[] = [];
   private _head: SnakeCell;
 
@@ -33,15 +34,15 @@ export class Snake {
     return this._cells;
   }
 
-  set dir(dir: 'RIGHT' | 'LEFT' | 'UP' | 'DOWN'){ this._dir = dir;}
+  set dir(dir: Sides){ this._dir = dir;}
 
   move(){
     let x = this._head.x, y = this._head.y;
     switch (this._dir) {
-      case "RIGHT": x++; break;
-      case "LEFT": x--; break;
-      case "UP": y--; break;
-      case "DOWN": y++; break;
+      case Sides.right: x++; break;
+      case Sides.left: x--; break;
+      case Sides.top: y--; break;
+      case Sides.bottom: y++; break;
     }
 
     for(let i = this._cells.length - 1; i > 0; i--){
@@ -69,23 +70,15 @@ export class Snake {
   reverse(){
       this._cells.reverse();
       this._head = this._cells[0];
-      this.reverseDir();
-
+      this._dir = reverseSide(this._dir);
   }
 
-  private reverseDir(){
-      switch (this._dir) {
-          case "RIGHT": this.dir = "LEFT"; break;
-          case "LEFT": this.dir = "RIGHT"; break;
-          case "UP": this.dir = "DOWN"; break;
-          case "DOWN": this.dir = "UP"; break;
-      }
-  }
+
 
   private checkItMySelf(){
       const head = this._head;
       const cell = this._cells.find(item => item !== head && item.x === head.x && item.y === head.y );
-      if(cell){ return true; }
+      if (cell) { return true; }
       return false;
   }
 

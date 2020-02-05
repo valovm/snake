@@ -49,8 +49,6 @@ class Orange implements Food {
     get x(): number { return this._x; }
     get y(): number { return this._y; }
 
-
-
     private getRandomColor() {
         var letters = '0123456789ABCDEF';
         var color = '#';

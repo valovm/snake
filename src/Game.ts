@@ -1,7 +1,8 @@
 import {Food, FoodService} from "./Foods";
 import {Snake} from "./Snake";
-import {getRandomInt} from "./heplers";
+import {getRandomInt, reverseSide, Sides} from "./heplers";
 import {CanvasRenderServiceImpl, RenderService} from "./RenderService";
+import {Area} from "./Area";
 
 interface GameSettings {
    maxTry: number;
@@ -10,13 +11,16 @@ interface GameSettings {
    size: number;
 }
 
+
 export class Game {
     constructor(el: HTMLCanvasElement, settings?: GameSettings) {
         this._settings = {...settings, ...this._settings};
-        this.setGameArea(this._settings.gameArea.w, this._settings.gameArea.h );
         this._size = this._settings.size;
 
         this._foodService = new FoodService();
+
+        this._area = new Area(0, this._settings.gameArea.w / this._size -1 ,
+                              0, this._settings.gameArea.h / this._size -1);
 
         this._render = new CanvasRenderServiceImpl(el, this);
         this._render.render();
@@ -26,6 +30,7 @@ export class Game {
 
     private  _render: RenderService;
 
+    private  _area: Area;
     private  _snake: Snake;
     private _food: Food[] = [];
     private _foodService: FoodService;
@@ -36,13 +41,16 @@ export class Game {
     private _speed: number = 200;
     private _size: number = 0;
     private _timer: any;
-    private _gameArea: { h: number, w: number } = { h: 0, w: 0 };
+
+
+    private _q = 113;
 
     private readonly _settings: GameSettings = {
         maxTry: 1,
         foodTimeout: {max: 8, min: 4},
         gameArea: { h: 800, w: 800 },
         size: 16,
+
     };
 
     get snake(): Snake { return this._snake };
@@ -50,11 +58,7 @@ export class Game {
     get score(): number { return this._score };
     get size(): number { return this._size }
 
-    get gameArea() { return this._gameArea; }
-    private setGameArea(w: number, h: number) {
-        this._gameArea.h = h;
-        this._gameArea.w = w;
-    }
+    get area():Area { return this._area; }
 
     newGame() {
         this._food = [];
@@ -92,11 +96,22 @@ export class Game {
     }
 
     private snakeContactWall(){
-        const x = this._snake.x() * this._size,
-              y = this._snake.y() * this._size;
-        if (x < 0 || x >= this._gameArea.w || y < 0 || y >= this._gameArea.h ){
-            this._snake.reverse()
+        const contact = this.checkSnakeContactWall();
+        if (contact){
+            this._snake.reverse();
+            // this._area.reduce(reverseSide(contact), this._q);
         }
+    }
+
+    private checkSnakeContactWall(): Sides|undefined{
+        const x = this._snake.x(),
+              y = this._snake.y();
+        if(x < this.area.x1) { return Sides.right }
+        if(x + 1 >= this.area.x2) { return Sides.left }
+        if(y < this.area.y1) { return Sides.top }
+        if(y + 1 > this.area.y2) { return Sides.bottom }
+
+        return undefined;
     }
 
     private snakeEatFood(){
@@ -112,8 +127,8 @@ export class Game {
 
     private randomCoords(){
         const coords = {
-            x: getRandomInt(this._gameArea.w / this._size),
-            y: getRandomInt(this._gameArea.h / this._size),
+            x: getRandomInt(this._area.x2, this._area.x1),
+            y: getRandomInt(this._area.y2, this._area.y1),
         };
         return coords;
     }
@@ -124,14 +139,13 @@ export class Game {
 
     private arrowControls(e: KeyboardEvent){
         const keys = [
-            { codes: [65, 37], dir: 'LEFT' },
-            { codes: [87, 38], dir: 'UP' },
-            { codes: [68, 39], dir: 'RIGHT' },
-            { codes: [83, 40], dir: 'DOWN' },
+            { codes: [65, 37], dir: Sides.left },
+            { codes: [87, 38], dir: Sides.top },
+            { codes: [68, 39], dir: Sides.right },
+            { codes: [83, 40], dir: Sides.bottom },
         ];
         const key = keys.find( key => key.codes.includes(e.keyCode));
         if( key  && this._state == 'play') {
-            // @ts-ignore
             this._snake.dir = key.dir;
             this._snake.move() }
     }
