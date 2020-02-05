@@ -1,9 +1,11 @@
-import {Food, FoodService} from './Foods';
+
 import {Snake} from './Snake';
 import {Dirs, getRandomInt, reverseSide, Sides} from './common';
 import {Area} from './Area';
 import {CanvasRenderServiceImpl} from './render/CanvasRenderService.Impl';
 import {RenderService} from './render/RenderService';
+import {FoodService} from './foods/FoodService';
+import {Food} from './foods/Foods';
 
 interface GameSettings {
    maxTry: number;
@@ -30,10 +32,9 @@ export class Game {
         window.addEventListener('keydown', (e: KeyboardEvent) => this.arrowControls(e) );
     }
 
-    private  _render: RenderService;
-
-    private  _area: Area;
-    private  _snake: Snake;
+    private _render: RenderService;
+    private _area: Area;
+    private _snake: Snake;
     private _food: Food[] = [];
     private _foodService: FoodService;
 
@@ -43,7 +44,6 @@ export class Game {
     private _speed: number = 200;
     private _size: number = 0;
     private _timer: any;
-
     private _reduceArea = 0;
 
     private readonly _settings: GameSettings = {

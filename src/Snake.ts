@@ -1,7 +1,6 @@
-
-import {Food} from './Foods';
 import {Callback, Dirs, reverseDir} from './common';
 import {Area} from './Area';
+import {Food} from './foods/Foods';
 
 class SnakeCell {
   constructor(
