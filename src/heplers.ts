@@ -5,6 +5,13 @@ enum Sides {
     bottom
 }
 
+enum Dirs {
+    left,
+    right,
+    up,
+    down
+}
+
 function getRandomInt(max: number, min: number = 0) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -21,4 +28,14 @@ function reverseSide(side: Sides): Sides {
     return side;
 }
 
-export { Sides, reverseSide,  getRandomInt }
+function reverseDir(dir: Dirs): Dirs {
+    switch (dir) {
+        case Dirs.down: return Dirs.up; break
+        case Dirs.up: return Dirs.down; break
+        case Dirs.left: return Dirs.right; break
+        case Dirs.right: return Dirs.left; break
+    }
+    return dir;
+}
+
+export { Dirs, Sides, reverseSide, reverseDir,  getRandomInt }

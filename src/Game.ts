@@ -1,8 +1,9 @@
 import {Food, FoodService} from "./Foods";
 import {Snake} from "./Snake";
-import {getRandomInt, reverseSide, Sides} from "./heplers";
-import {CanvasRenderServiceImpl, RenderService} from "./RenderService";
+import {Dirs, getRandomInt, reverseSide, Sides} from "./heplers";
 import {Area} from "./Area";
+import {CanvasRenderServiceImpl} from "./render/CanvasRenderService.Impl";
+import {RenderService} from "./render/RenderService";
 
 interface GameSettings {
    maxTry: number;
@@ -17,10 +18,12 @@ export class Game {
         this._settings = {...settings, ...this._settings};
         this._size = this._settings.size;
 
+        this._q = 112 / this._size;
+
         this._foodService = new FoodService();
 
-        this._area = new Area(0, this._settings.gameArea.w / this._size -1 ,
-                              0, this._settings.gameArea.h / this._size -1);
+        this._area = new Area(0, this._settings.gameArea.w / this._size ,
+                              0, this._settings.gameArea.h / this._size);
 
         this._render = new CanvasRenderServiceImpl(el, this);
         this._render.render();
@@ -43,7 +46,7 @@ export class Game {
     private _timer: any;
 
 
-    private _q = 113;
+    private _q = 0;
 
     private readonly _settings: GameSettings = {
         maxTry: 1,
@@ -97,9 +100,10 @@ export class Game {
 
     private snakeContactWall(){
         const contact = this.checkSnakeContactWall();
-        if (contact){
+
+        if (contact != undefined){
             this._snake.reverse();
-            // this._area.reduce(reverseSide(contact), this._q);
+            this._area.reduce(reverseSide(contact), this._q);
         }
     }
 
@@ -107,9 +111,10 @@ export class Game {
         const x = this._snake.x(),
               y = this._snake.y();
         if(x < this.area.x1) { return Sides.right }
-        if(x + 1 >= this.area.x2) { return Sides.left }
+        if(x + 1 > this.area.x2) { return Sides.left }
         if(y < this.area.y1) { return Sides.top }
         if(y + 1 > this.area.y2) { return Sides.bottom }
+
 
         return undefined;
     }
@@ -139,10 +144,10 @@ export class Game {
 
     private arrowControls(e: KeyboardEvent){
         const keys = [
-            { codes: [65, 37], dir: Sides.left },
-            { codes: [87, 38], dir: Sides.top },
-            { codes: [68, 39], dir: Sides.right },
-            { codes: [83, 40], dir: Sides.bottom },
+            { codes: [65, 37], dir: Dirs.left },
+            { codes: [87, 38], dir: Dirs.up },
+            { codes: [68, 39], dir: Dirs.right },
+            { codes: [83, 40], dir: Dirs.down },
         ];
         const key = keys.find( key => key.codes.includes(e.keyCode));
         if( key  && this._state == 'play') {

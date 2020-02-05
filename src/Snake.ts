@@ -1,6 +1,6 @@
 import {Callback} from "./callback";
 import {Food} from "./Foods";
-import {reverseSide, Sides} from "./heplers";
+import {Dirs, reverseDir} from "./heplers";
 
 class SnakeCell {
   constructor(
@@ -19,7 +19,7 @@ class SnakeCell {
 
 
 export class Snake {
-  private _dir: Sides = Sides.right;
+  private _dir: Dirs = Dirs.right;
   private _cells: SnakeCell[] = [];
   private _head: SnakeCell;
 
@@ -34,15 +34,15 @@ export class Snake {
     return this._cells;
   }
 
-  set dir(dir: Sides){ this._dir = dir;}
+  set dir(dir: Dirs){ this._dir = dir;}
 
   move(){
     let x = this._head.x, y = this._head.y;
     switch (this._dir) {
-      case Sides.right: x++; break;
-      case Sides.left: x--; break;
-      case Sides.top: y--; break;
-      case Sides.bottom: y++; break;
+      case Dirs.right: x++; break;
+      case Dirs.left: x--; break;
+      case Dirs.up: y--; break;
+      case Dirs.down: y++; break;
     }
 
     for(let i = this._cells.length - 1; i > 0; i--){
@@ -70,10 +70,8 @@ export class Snake {
   reverse(){
       this._cells.reverse();
       this._head = this._cells[0];
-      this._dir = reverseSide(this._dir);
+      this._dir = reverseDir(this._dir);
   }
-
-
 
   private checkItMySelf(){
       const head = this._head;
