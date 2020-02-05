@@ -116,11 +116,11 @@ export class Game {
     }
 
     private refreshFood() {
-        const foodIndex = this._food.findIndex(item => this.area.checkContact(item.x, item.y) != undefined);
-        if (foodIndex > - 1) {
-            this._food.splice(foodIndex, 1);
-            this.addFood();
-        }
+      const foodIndex = this._food.findIndex(item => this.area.checkContact(item.x, item.y) != undefined);
+      if (foodIndex > - 1) {
+          this._food.splice(foodIndex, 1);
+          this.addFood();
+      }
     }
 
     private randomCoords() {
