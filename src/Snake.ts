@@ -14,8 +14,8 @@ class SnakeCell {
   }
 
   get x(): number { return this._x; }
-  get y(): number { return this._y; }
   set x(x: number) { this._x = x; }
+  get y(): number { return this._y; }
   set y(y: number) { this._y = y; }
 
 }
@@ -31,6 +31,8 @@ export class Snake {
   private _head: SnakeCell;
   private _area: Area;
   private _callbacks: Callback[] = [];
+  private _timer: any;
+  private _speed: number = 200;
 
   x(): number { return this._head.x; }
   y(): number { return this._head.y; }
@@ -42,7 +44,17 @@ export class Snake {
     return this._cells;
   }
 
-  set dir(dir: Dirs) { this._dir = dir; }
+  set dir(dir: Dirs) {
+    if (this.length() > 1 && reverseDir(dir) === this._dir) { return; }
+    this._dir = dir;
+  }
+
+  go() {
+    this._timer = setInterval(() => { this.move(); }, this._speed );
+  }
+  stop() {
+    clearInterval(this._timer);
+  }
 
   move() {
     let x = this._head.x, y = this._head.y;

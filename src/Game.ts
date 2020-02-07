@@ -44,9 +44,7 @@ export class Game {
     private _score: number = 0;
     private _prevScore: number = undefined;
     private _try: number = 0;
-    private _speed: number = 200;
     private _size: number = 0;
-    private _timer: any;
     private _foodTimer: any;
     private _reduceArea = 0;
 
@@ -98,7 +96,7 @@ export class Game {
     start() {
         if (this._state === GameStates.stop) {
             this._state = GameStates.play;
-            this._timer = setInterval(() => { this._snake.move(); }, this._speed );
+            this.snake.go();
         }
     }
 
@@ -112,7 +110,7 @@ export class Game {
 
     private gameOver() {
         this._state = GameStates.over;
-        clearInterval(this._timer);
+        this.snake.stop();
     }
 
     private addFood() {
