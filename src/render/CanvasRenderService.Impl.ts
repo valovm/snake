@@ -2,55 +2,71 @@ import {RenderService} from './RenderService';
 import {Game} from '../Game';
 
 export class CanvasRenderServiceImpl implements RenderService {
-    constructor(el: HTMLCanvasElement, game: Game) {
-        this.el = el;
+    constructor(el: HTMLElement, game: Game) {
+        this.elRoot = el;
         this.game = game;
         this.init();
     }
-    private readonly el: HTMLCanvasElement;
+    private readonly border = 1;
     private readonly game: Game;
     private context: CanvasRenderingContext2D;
 
+  private readonly elRoot: HTMLElement;
+  private elCanvas: HTMLCanvasElement;
+
     render() {
-        this.context.clearRect(0, 0, this.el.clientWidth,  this.el.clientHeight );
-
-        this.wallsRender();
-        this.snakeRender();
-        this.foodRender();
-
-        window.requestAnimationFrame(() => this.render());
+      this.CanvasRender();
     }
 
-    init() {
-        this.context = this. el.getContext('2d');
-        this.el.width = this.game.area.width() * this.game.size;
-        this.el.height = this.game.area.height() * this.game.size;
+    private init() {
+
+      this.elCanvas = document.createElement('canvas') as HTMLCanvasElement;
+      this.context = this.elCanvas.getContext('2d');
+      this.elCanvas.width = this.game.area.width() * this.game.size + (this.border * 2);
+      this.elCanvas.height = this.game.area.height() * this.game.size + (this.border * 2);
+      this.elRoot.appendChild(this.elCanvas);
+
+    }
+
+    private CanvasRender() {
+      this.context.clearRect(0, 0, this.elCanvas.clientWidth + (this.border * 2),  this.elCanvas.clientHeight + (this.border * 2) );
+
+      this.wallsRender();
+      this.snakeRender();
+      this.foodRender();
+
+      window.requestAnimationFrame(() => this.CanvasRender());
     }
 
     private wallsRender() {
-        this.context.strokeStyle = 'blue';
+        this.context.strokeStyle = '#6519fb';
+        this.context.lineWidth = this.border;
         this.context.strokeRect(
-            this.game.area.x1 * this.game.size,
-            this.game.area.y1 * this.game.size,
+          this.getCoord(this.game.area.x1),
+          this.getCoord(this.game.area.y1),
             this.game.area.width()  * this.game.size,
             this.game.area.height()  * this.game.size );
     }
 
     private snakeRender() {
         if (!this.game.snake) { return; }
-        this.context.strokeStyle = 'green';
+        this.context.strokeStyle = 'white';
+        this.context.fillStyle = 'white';
         this.game.snake.cells.forEach(item => {
-            const x =  item.x * this.game.size,
-                y =  item.y * this.game.size;
+            const x = this.getCoord(item.x),
+                  y = this.getCoord(item.y);
+            this.context.lineWidth = 1;
             this.context.strokeRect(x , y, this.game.size, this.game.size);
+            this.context.fillRect(x + 2 , y + 2, this.game.size - 4, this.game.size - 4 );
         });
     }
 
     private foodRender() {
         this.game.food.forEach(item => {
             this.context.fillStyle = item.color;
-            const x =  item.x * this.game.size,
-                y =  item.y * this.game.size;
+            const x = this.getCoord(item.x),
+                  y = this.getCoord(item.y);
+
             switch (item.shape) {
                 case 'square':
                     this.context.fillRect(x , y, this.game.size, this.game.size);
@@ -64,5 +80,9 @@ export class CanvasRenderServiceImpl implements RenderService {
                     break;
             }
         });
+    }
+
+    private getCoord(x: number): number {
+      return x * this.game.size + this.border;
     }
 }

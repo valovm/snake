@@ -8,7 +8,7 @@ export class Apple implements Food {
 
   readonly count: number = 1;
   readonly score: number = 1;
-  readonly color: string = 'red';
+  readonly color: string = '#ff4157';
   readonly shape: string = 'square';
 
   get x(): number { return this._x; }

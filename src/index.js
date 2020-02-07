@@ -1,11 +1,7 @@
 import {Game} from "./Game";
 
-const canvas = document.getElementById('game-snake');
+const gameDiv = document.getElementById('game-snake');
 
-const game = new Game(canvas);
+const game = new Game(gameDiv);
 game.newGame();
 game.start();
-
-
-
-

@@ -16,7 +16,7 @@ interface GameSettings {
 }
 
 export class Game {
-    constructor(el: HTMLCanvasElement, settings?: GameSettings) {
+    constructor(el: HTMLElement, settings?: GameSettings) {
         this._settings = {...settings, ...this._settings};
         this._size = this._settings.size;
         this._reduceArea  = this._settings.reduceArea / this._size;

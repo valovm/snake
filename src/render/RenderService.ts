@@ -1,6 +1,6 @@
 import {Game} from '../Game';
 
 export abstract class RenderService {
-    private constructor(el: HTMLCanvasElement, game: Game) {}
+    private constructor(el: HTMLElement, game: Game) {}
     abstract render(): void;
 }

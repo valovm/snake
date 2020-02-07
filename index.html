@@ -1,11 +1,42 @@
 <!doctype html>
 <html>
 <head>
-  <title>Getting Started</title>
+  <title>Snake Game</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
+<div id="game">
+  <div class="game-display">
+    <div class="game-score digit">
+      <div class="digit-label">
+        Score
+      </div>
+      <div class="digit-value">
+        3000
+      </div>
+    </div>
+    <div id="game-snake"></div>
+    <div class="modal" id="modalGameOver">
+      <div class="modal-content">
+        <div class="modal-title">Game Over</div>
+        <div class="game-score digit">
+          <div class="digit-label">
+            Your score
+          </div>
+          <div class="digit-value">
+            3000
+          </div>
+        </div>
+        <button class="btn btn-light btn-lg">Restart</button>
+      </div>
 
-<canvas id="game-snake"></canvas>
+    </div>
+
+  </div>
+
+</div>
+
 
 <script src="dist/bundle.js"></script>
 </body>
