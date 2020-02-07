@@ -2,7 +2,9 @@
   "name": "snake_game",
   "version": "1.0.0",
   "description": "",
-  "dependencies": {},
+  "dependencies": {
+    "vue": "^2.6.11"
+  },
   "devDependencies": {
     "ts-loader": "^6.2.1",
     "typescript": "^3.7.5",

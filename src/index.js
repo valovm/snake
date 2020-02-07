@@ -1,7 +1,29 @@
+
 import {Game} from "./Game";
+import Vue from 'vue/dist/vue.js';
 
-const gameDiv = document.getElementById('game-snake');
+var app = new Vue({
+    el: '#app',
+    data: {
+        game: new Game(),
+    },
+    methods:{
+        restart(){
+            this.game.restart();
+        },
+        scoreWin() {
+            return this.game.prevScore != undefined && this.game.score > this.game.prevScore;
+        }
+    },
+    computed:{
+        modal(){
+            return this.game.state === 'over';
+        }
+    },
+    mounted() {
+        this.game.render(this.$refs['game-snake']);
+        this.game.newGame();
+        this.game.start();
+    }
 
-const game = new Game(gameDiv);
-game.newGame();
-game.start();
+});

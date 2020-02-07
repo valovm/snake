@@ -12,9 +12,16 @@ export class Area {
     height(): number { return this._y2 - this._y1; }
 
     get x1(): number { return this._x1; }
+    set x1(x1: number) { this._x1 = x1; }
+
     get x2(): number { return this._x2; }
+    set x2(x2: number) { this._x2 = x2; }
+
     get y1(): number { return this._y1; }
+    set y1(y1: number) { this._y1 = y1; }
+
     get y2(): number { return this._y2; }
+    set y2(y2: number) { this._y2 = y2; }
 
     reduce(side: Sides, units: number) {
       switch (side) {

@@ -15,8 +15,14 @@ interface GameSettings {
    reduceArea: number;
 }
 
+export enum GameStates {
+  play = 'play',
+  stop = 'stop',
+  over = 'over',
+}
+
 export class Game {
-    constructor(el: HTMLElement, settings?: GameSettings) {
+    constructor(settings?: GameSettings) {
         this._settings = {...settings, ...this._settings};
         this._size = this._settings.size;
         this._reduceArea  = this._settings.reduceArea / this._size;
@@ -26,9 +32,6 @@ export class Game {
         this._area = new Area(0, this._settings.gameArea.w / this._size ,
                               0, this._settings.gameArea.h / this._size);
 
-        this._render = new CanvasRenderServiceImpl(el, this);
-        this._render.render();
-
         window.addEventListener('keydown', (e: KeyboardEvent) => this.arrowControls(e) );
     }
 
@@ -37,16 +40,17 @@ export class Game {
     private _snake: Snake;
     private _food: Food[] = [];
     private _foodService: FoodService;
-
-    private _state: 'stop' | 'play' = 'stop';
+    private _state: GameStates = GameStates.stop;
     private _score: number = 0;
+    private _prevScore: number = undefined;
     private _try: number = 0;
     private _speed: number = 200;
     private _size: number = 0;
     private _timer: any;
+    private _foodTimer: any;
     private _reduceArea = 0;
 
-    private readonly _settings: GameSettings = {
+    private _settings: GameSettings = {
         maxTry: 1,
         foodTimeout: {max: 8, min: 4},
         gameArea: { h: 800, w: 800 },
@@ -57,35 +61,57 @@ export class Game {
     get snake(): Snake { return this._snake; }
     get food(): Food[] { return this._food; }
     get score(): number { return this._score; }
+    get prevScore(): number { return this._prevScore; }
     get size(): number { return this._size; }
     get area(): Area { return this._area; }
+    get state(): GameStates { return this._state; }
+
+    render(el: HTMLElement) {
+      this._render = new CanvasRenderServiceImpl(el, this);
+      this._render.render();
+    }
+
+    canRestart() {
+      if (this._try + 1 > this._settings.maxTry) { return false ; }
+
+      return  true;
+    }
 
     newGame() {
-        this._food = [];
+        this._state = GameStates.stop;
+        this._score = 0;
+        this._area.x1 = 0;
+        this._area.y1 = 0;
+        this._area.x2 = this._settings.gameArea.w / this._size;
+        this._area.y2 = this._settings.gameArea.h / this._size;
         const coords = this.randomCoords();
         this._snake = new Snake(coords.x, coords.y, this._area);
         this._snake.on({name: 'move', callback: () => { this.snakeEatFood(); }});
         this._snake.on({name: 'eatMyself', callback: () => { this.gameOver(); } });
         this._snake.on({name: 'snakeWallContact', callback: (e: Sides) => { this.snakeWallContact(e); } });
+
+        clearTimeout(this._foodTimer);
+        this._food = [];
         this.addFood();
     }
 
     start() {
-        if (this._state !== 'play') {
-            this._state = 'play';
+        if (this._state === GameStates.stop) {
+            this._state = GameStates.play;
             this._timer = setInterval(() => { this._snake.move(); }, this._speed );
         }
     }
 
     restart() {
-        if (this._try > this._settings.maxTry) { return false ; }
-        this._try++;
-        this.newGame();
-        this.start();
+      if (!this.canRestart()) { return false ; }
+      this._try++;
+      this._prevScore = this._score;
+      this.newGame();
+      this.start();
     }
 
     private gameOver() {
-        this._state = 'stop';
+        this._state = GameStates.over;
         clearInterval(this._timer);
     }
 
@@ -111,7 +137,7 @@ export class Game {
             this.snake.eat(food);
             this._score += food.score;
             this._food.splice(index, 1);
-            setTimeout(() => this.addFood() , this.randomFoodTimeout() );
+            this._foodTimer = setTimeout(() => this.addFood() , this.randomFoodTimeout() );
         }
     }
 

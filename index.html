@@ -6,38 +6,40 @@
   <link href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-<div id="game">
-  <div class="game-display">
-    <div class="game-score digit">
-      <div class="digit-label">
-        Score
+<div id="app">
+
+  <div id="game"  v-if="game">
+    <div class="game-display">
+      <div class="digit">
+        <div class="digit-label">Score</div>
+        <div class="digit-value" :class="{ 'score-win': scoreWin() }">{{ game.score }}</div>
       </div>
-      <div class="digit-value">
-        3000
-      </div>
-    </div>
-    <div id="game-snake"></div>
-    <div class="modal" id="modalGameOver">
-      <div class="modal-content">
-        <div class="modal-title">Game Over</div>
-        <div class="game-score digit">
-          <div class="digit-label">
-            Your score
+      <div ref="game-snake"></div>
+
+      <div class="modal"  v-if="modal">
+        <div class="modal-content">
+          <div class="modal-title">Game Over</div>
+          <div class="game-score digit">
+            <div class="digit-label">
+              Your score
+            </div>
+            <div class="digit-value">
+              {{ game.score }}
+            </div>
           </div>
-          <div class="digit-value">
-            3000
-          </div>
+          <button class="btn btn-light btn-lg" v-if="game.canRestart()" @click="restart">Restart</button>
         </div>
-        <button class="btn btn-light btn-lg">Restart</button>
+
       </div>
 
     </div>
 
   </div>
-
 </div>
 
 
+
 <script src="dist/bundle.js"></script>
+
 </body>
 </html>
