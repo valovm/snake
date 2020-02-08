@@ -11,6 +11,7 @@ enum Dirs {
     up,
     down,
 }
+
 interface Callback {
     name: string;
     callback: any;

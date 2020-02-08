@@ -67,58 +67,49 @@ export class Snake {
 
     const contact = this._area.checkContact(x, y);
     if (contact !== undefined) {
-        this.emit('snakeWallContact', contact);
+      this.emit('snakeWallContact', contact);
     } else {
-        for (let i = this._cells.length - 1; i > 0; i--) {
-            const cell = this._cells[i];
-            cell.setXy(this._cells[i - 1].x, this._cells[i - 1].y);
-        }
-        this._cells[0].setXy(x, y);
+      // Move Snake
+      for (let i = this._cells.length - 1; i > 0; i--) {
+          const cell = this._cells[i];
+          cell.setXy(this._cells[i - 1].x, this._cells[i - 1].y);
+      }
+      this._cells[0].setXy(x, y);
     }
-
     this.emit('move');
     if ( this.checkItMySelf() ) { this.emit('eatMyself'); }
   }
 
   eat(food: Food) {
      for (let i = 0; i < food.count; i++) {
-         const endCell = this.cells[this.cells.length - 1];
-         const cell = new SnakeCell(endCell.x, endCell.y);
-         this.move();
-         this.cells.push(cell);
+       const endCell = this.cells[this.cells.length - 1];
+       const cell = new SnakeCell(endCell.x, endCell.y);
+       this.move();
+       this.cells.push(cell);
      }
   }
 
   reverse() {
-      this._cells.reverse();
-      this._head = this._cells[0];
-      this._dir = reverseDir(this._dir);
-  }
-
-  reverse2() {
-    switch (this._dir) {
-        case Dirs.down: return this._head.y = this._area.y1; break;
-        case Dirs.up: return this._head.y = this._area.y2; break;
-        case Dirs.left: return this._head.x = this._area.x2; break;
-        case Dirs.right: return this._head.x = this._area.x1; break;
-    }
+    this._cells.reverse();
+    this._head = this._cells[0];
+    this._dir = reverseDir(this._dir);
   }
 
   private checkItMySelf() {
-      const head = this._head;
-      const cell = this._cells.find(item => item !== head && item.x === head.x && item.y === head.y );
-      if (cell) { return true; }
-      return false;
+    const head = this._head;
+    const cell = this._cells.find(item => item !== head && item.x === head.x && item.y === head.y );
+    if (cell) { return true; }
+    return false;
   }
 
   on(callback: Callback) {
-      this._callbacks.push(callback);
+    this._callbacks.push(callback);
   }
 
   private emit(eventName: string, context?: any) {
       this._callbacks
-          .filter(item => item.name === eventName)
-          .forEach(item => item.callback(context));
+        .filter(item => item.name === eventName)
+        .forEach(item => item.callback(context));
   }
 
 }

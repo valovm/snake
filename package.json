@@ -14,7 +14,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --mode=development",
+    "build": "webpack --mode=production",
     "start": "webpack --mode=development  --hot=true",
     "lint": "tslint -p tsconfig.json -c tslint.json"
   },
