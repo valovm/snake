@@ -31,12 +31,13 @@ export class CanvasRenderServiceImpl implements RenderService {
     private CanvasRender() {
       this.context.clearRect(0, 0, this.elCanvas.clientWidth + (this.border * 2),  this.elCanvas.clientHeight + (this.border * 2) );
 
-      this.wallsRender();
+      // this.wallsRender();
       this.snakeRender();
       this.foodRender();
 
       window.requestAnimationFrame(() => this.CanvasRender());
     }
+    /*
 
     private wallsRender() {
         this.context.strokeStyle = '#6519fb';
@@ -47,7 +48,7 @@ export class CanvasRenderServiceImpl implements RenderService {
             this.game.area.width()  * this.game.size,
             this.game.area.height()  * this.game.size );
     }
-
+*/
     private snakeRender() {
         if (!this.game.snake) { return; }
         this.context.strokeStyle = 'white';
@@ -62,7 +63,7 @@ export class CanvasRenderServiceImpl implements RenderService {
     }
 
     private foodRender() {
-        this.game.food.forEach(item => {
+        this.game.foods.forEach(item => {
             this.context.fillStyle = item.color;
             const x = this.getCoord(item.x),
                   y = this.getCoord(item.y);

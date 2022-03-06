@@ -1,4 +1,4 @@
-export abstract class Food {
+export interface Food {
   x: number;
   y: number;
   count: number;
