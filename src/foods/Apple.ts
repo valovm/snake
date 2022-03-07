@@ -1,16 +1,8 @@
 import {Food} from './Foods';
 
-export class Apple implements Food {
-  constructor(
-    private _x: number,
-    private _y: number,
-  ) {}
-
+export class Apple extends Food {
   readonly count: number = 1;
   readonly score: number = 1;
   readonly color: string = '#ff4157';
   readonly shape: string = 'square';
-
-  get x(): number { return this._x; }
-  get y(): number { return this._y; }
 }

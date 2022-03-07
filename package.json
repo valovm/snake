@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "dependencies": {
+    "@types/node": "^17.0.21",
     "vue": "^2.6.11"
   },
   "devDependencies": {

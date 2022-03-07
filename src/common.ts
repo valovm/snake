@@ -12,11 +12,6 @@ enum Dirs {
     down,
 }
 
-interface Callback {
-    name: string;
-    callback: any;
-}
-
 function getRandomInt(max: number, min: number = 0) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -43,4 +38,4 @@ function reverseDir(dir: Dirs): Dirs {
     return dir;
 }
 
-export { Dirs, Sides, reverseSide, reverseDir,  getRandomInt, Callback };
+export { Dirs, Sides, reverseSide, reverseDir,  getRandomInt };
