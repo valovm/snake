@@ -1,7 +1,7 @@
 import { Dirs, reverseDir } from './common';
-import {GameObject} from './GameObject';
 
 import { AddedGameObjects, SnakeAteFood, SnakeDied } from './GameEvents';
+import { GameObject } from './GameObject';
 import { Food } from './gameObjects/foods/Foods';
 import { Rock } from './gameObjects/Rock';
 
@@ -31,6 +31,9 @@ export class Snake extends GameObject {
 
   private _dir: Dirs = Dirs.right;
   private _cells: SnakeCell[] = [];
+  private _delta: number = 0;
+  private _speed: number = 500;
+  private _cellToAdd: number = 0;
 
   constructor(x: number, y: number) {
     super();
@@ -39,7 +42,9 @@ export class Snake extends GameObject {
 
   get x(): number { return this.cells[0].x; }
   get y(): number { return this.cells[0].y; }
-
+  get end(): SnakeCell {
+    return this._cells[this._cells.length - 1];
+  }
   get cells(): SnakeCell[] {
     return this._cells;
   }
@@ -50,9 +55,8 @@ export class Snake extends GameObject {
 
   onCollision(object: GameObject) {
     if (object instanceof Food) {
-      const cells = this.eat(object);
       this.events.emit('event', new SnakeAteFood(this, object));
-      this.events.emit('event', new AddedGameObjects(cells));
+      this.eat(object);
       return;
     }
     if (object instanceof SnakeCell) {
@@ -66,7 +70,15 @@ export class Snake extends GameObject {
   }
 
   update(delta: number): void {
-    this.move();
+    this._delta += delta;
+    if (this._delta > this._speed) {
+      if (this._cellToAdd > 0) {
+        this.addCell(this.end.x, this.end.y);
+        this.move();
+      } else { this.move(); }
+      this._delta -= this._speed;
+    }
+
   }
 
   length() {
@@ -88,15 +100,13 @@ export class Snake extends GameObject {
     }
     this._cells[0].setXy(x, y);
   }
-
   private eat(food: Food) {
-    const cells = [];
-    for (let i = 0; i < food.count; i++) {
-      const endCell = this.cells[this.cells.length - 1];
-      const cell = new SnakeCell(endCell.x, endCell.y);
-      this.cells.push(cell);
-      cells.push(cell);
-    }
-    return cells;
+    this._cellToAdd += food.count;
+  }
+  private addCell(x: number, y: number) {
+    const cell = new SnakeCell(x, y);
+    this.cells.push(cell);
+    this._cellToAdd--;
+    this.events.emit('event', new AddedGameObjects( [cell]) );
   }
 }

@@ -36,6 +36,8 @@ export class Game {
   private _score: number = 0;
   private readonly _scores: number[] = [];
 
+  private _previousTime = Date.now();
+
   private _settings: GameSettings;
 
   constructor(settings?: GameSettings) {
@@ -59,11 +61,16 @@ export class Game {
   }
 
   update(): void {
-    this._snake.update(1);
-    this._checker.checkCollisions(this._snake, this._gameWorld.getObjects());
+    const delta = Date.now() - this._previousTime;
+    this._previousTime = Date.now();
+    this._gameWorld.getObjects().forEach(object => {
+      object.update(delta);
+      this._checker.checkCollisions(object, this._gameWorld.getObjects());
+    });
   }
 
   newGame() {
+    this._previousTime = Date.now();
     this._gameWorld.clear();
     this._state = GameStates.stop;
     this._score = 0;
@@ -75,7 +82,7 @@ export class Game {
 
   start() {
     this._state = GameStates.play;
-    this._gameTimer = setInterval(() => { this.update(); }, 500);
+    this._gameTimer = setInterval(() => { this.update(); }, 20);
   }
 
   restart() {
@@ -91,10 +98,10 @@ export class Game {
   handlerKey(keyCode: number) {
     if (this._state !== GameStates.play) { return; }
     const actions = {
-      SnakeUp: () => { this._snake.dir = Dirs.up; },
-      SnakeDown: () => { this._snake.dir = Dirs.down; },
-      SnakeLeft: () => { this._snake.dir = Dirs.left; },
-      SnakeRight: () => { this._snake.dir = Dirs.right; },
+      SnakeUp: () => { this._snake.dir = Dirs.up; this._snake.move(); },
+      SnakeDown: () => { this._snake.dir = Dirs.down; this._snake.move(); },
+      SnakeLeft: () => { this._snake.dir = Dirs.left; this._snake.move(); },
+      SnakeRight: () => { this._snake.dir = Dirs.right; this._snake.move(); },
     };
     const keys = [
       { codes: [65, 37], action: actions.SnakeLeft },

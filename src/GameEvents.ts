@@ -9,7 +9,7 @@ export interface GameEvent {
 export class AddedGameObjects implements GameEvent {
   readonly data: { objects: GameObject[] };
 
-  constructor(objects: GameObject[] ) {
+  constructor(objects: GameObject[]) {
     this.data = { objects };
   }
 }
