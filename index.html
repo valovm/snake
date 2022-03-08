@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+  <title>Snake Game</title>
+  <link rel="stylesheet" href="/public/css/main.css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="app">
+
+  <div id="game"  v-if="game">
+    <div class="game-display">
+        <div class="d-flex">
+            <div class="digit" style="width: 100px">
+                <div class="digit-label">Score</div>
+                <div class="digit-value">{{ game.score }}</div>
+            </div>
+            <div class="digit">
+                <div class="digit-label">Best Score</div>
+                <div class="digit-value">{{ bestScore }}</div>
+            </div>
+        </div>
+
+      <div ref="game-snake"></div>
+
+      <div class="modal"  v-if="modalGameOverShow">
+        <div class="modal-content">
+          <div class="modal-title">Game Over</div>
+          <div class="game-score digit">
+            <div class="digit-label">
+              Your score
+            </div>
+            <div class="digit-value">
+              {{ game.score }}
+            </div>
+          </div>
+          <button class="btn btn-light btn-lg" @click="restart">Restart</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+
+<script src="/public/bundle.js"></script>
+
+</body>
+</html>
