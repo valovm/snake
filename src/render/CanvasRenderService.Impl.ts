@@ -1,4 +1,5 @@
 import { GameObject } from '../GameObject';
+import { AreaBorder } from '../gameObjects/Area';
 import { Food } from '../gameObjects/foods/Foods';
 import { Rock } from '../gameObjects/Rock';
 import {RenderService} from './RenderService';
@@ -45,6 +46,7 @@ export class CanvasRenderServiceImpl implements RenderService {
       this.objects.forEach(o => {
         if (o instanceof Food) { this.foodRender(o); return; }
         if (o instanceof Rock) { this.rockRender(o); return; }
+        if (o instanceof AreaBorder) { this.rockRender(o); return; }
       });
 
       window.requestAnimationFrame(() => this.CanvasRender());

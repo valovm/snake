@@ -29,3 +29,11 @@ export class SnakeDied implements GameEvent {
     this.data = { snake };
   }
 }
+
+export class AreaSizeChanged implements GameEvent {
+  readonly data: { x: number; y: number; width: number; height: number };
+
+  constructor(x: number, y: number, width: number, height: number) {
+    this.data = { x, y, width, height };
+  }
+}

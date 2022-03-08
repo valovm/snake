@@ -6,6 +6,7 @@ export abstract class GameObject {
     width: number;
     height: number;
     readonly events: EventEmitter = new EventEmitter();
+    readonly children: GameObject[] = [];
 
     abstract onCollision(object: GameObject): void;
     abstract update(delta: number): void;

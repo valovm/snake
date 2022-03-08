@@ -1,8 +1,9 @@
 import { Dirs, getRandomInt } from './common';
 
 import { GameCollisionChecker } from './GameCollisionChecker';
-import { AddedGameObjects, GameEvent, SnakeAteFood, SnakeDied } from './GameEvents';
+import { AddedGameObjects, AreaSizeChanged, GameEvent, SnakeAteFood, SnakeDied } from './GameEvents';
 import { GameObject } from './GameObject';
+import { Area } from './gameObjects/Area';
 import { FoodService } from './gameObjects/foods/FoodService';
 import { Rock } from './gameObjects/Rock';
 import { GameWorld } from './GameWorld';
@@ -24,7 +25,8 @@ export class Game {
     cols: 50,
     rows: 30,
   };
-
+  private _x = 0;
+  private _y = 0;
   private readonly _checker: GameCollisionChecker;
   private readonly _gameWorld: GameWorld;
   private readonly _foodService: FoodService;
@@ -68,7 +70,7 @@ export class Game {
     this._state = GameStates.stop;
     this._score = 0;
 
-    this.addBorders();
+    this.AddArea();
     this.addSnake();
     this.addFood();
   }
@@ -113,6 +115,14 @@ export class Game {
     this._gameWorld.addObject(new Rock(0, this.size.rows - 1, this.size.cols, 1));
     this._gameWorld.addObject(new Rock(5, 5, 4, 4));
   }
+
+  private AddArea() {
+    const area = new Area(0, 0, this.size.cols, this.size.rows);
+    for (const key in area.borders){
+      this._gameWorld.addObject(area.borders[key])
+    }
+  }
+
   private addFood() {
     let food;
     do {
@@ -134,8 +144,8 @@ export class Game {
 
   private randomCoords() {
     const coords = {
-      x: getRandomInt(this.size.cols - 2, 1),
-      y: getRandomInt(this.size.rows - 2, 1),
+      x: getRandomInt(this.size.cols - 2, this._x + 1),
+      y: getRandomInt(this.size.rows - 2, this._y + 1),
     };
     return coords;
   }
@@ -154,6 +164,12 @@ export class Game {
     }
     if (event instanceof SnakeDied) {
       this.gameOver();
+    }
+    if (event instanceof AreaSizeChanged) {
+      this._settings.rows = event.data.height;
+      this._settings.cols = event.data.width;
+      this._x = event.data.x;
+      this._y = event.data.y;
     }
   }
 }

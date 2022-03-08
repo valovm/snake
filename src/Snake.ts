@@ -2,6 +2,7 @@ import { Dirs, reverseDir } from './common';
 import {GameObject} from './GameObject';
 
 import { AddedGameObjects, SnakeAteFood, SnakeDied } from './GameEvents';
+import { AreaBorder } from './gameObjects/Area';
 import { Food } from './gameObjects/foods/Foods';
 import { Rock } from './gameObjects/Rock';
 
@@ -63,6 +64,10 @@ export class Snake extends GameObject {
       this.events.emit('event', new SnakeDied(this));
       return;
     }
+    if (object instanceof AreaBorder) {
+      this.reverse();
+      return;
+    }
   }
 
   update(delta: number): void {
@@ -98,5 +103,12 @@ export class Snake extends GameObject {
       cells.push(cell);
     }
     return cells;
+  }
+
+  reverse() {
+    this._cells.reverse();
+    this._dir = reverseDir(this._dir);
+    this.move();
+    this.move();
   }
 }

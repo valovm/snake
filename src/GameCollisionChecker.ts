@@ -5,6 +5,7 @@ export class GameCollisionChecker {
     objects.forEach(item => {
         if (this.isCollision(object, item)) {
           object.onCollision(item);
+          item.onCollision(object);
         }
     });
   }

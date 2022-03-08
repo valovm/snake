@@ -12,7 +12,6 @@ export class GameWorld {
   addObject(object: GameObject) {
     this.subscribeForEvents(object);
     this.objects.push(object);
-
   }
   clear() {
     const objects = [...this.objects];
