@@ -1,13 +1,19 @@
-import {Dirs, reverseDir} from './common';
+import { Dirs, reverseDir } from './common';
 import {GameObject} from './GameObject';
-import {Food} from './foods/Foods';
+
 import { AddedGameObjects, SnakeAteFood, SnakeDied } from './GameEvents';
+import { Food } from './gameObjects/foods/Foods';
+import { Rock } from './gameObjects/Rock';
 
 class SnakeCell extends GameObject {
   constructor(
     private _x: number,
     private _y: number,
-  ) { super(); }
+  ) {
+    super();
+    this.height = 1;
+    this.width = 1;
+  }
 
   setXy(x: number, y: number) {
     this._x = x;
@@ -18,11 +24,30 @@ class SnakeCell extends GameObject {
   get y(): number { return this._y; }
 
   onCollision(object: GameObject): void {}
-
   update(delta: number): void {}
 }
 
 export class Snake extends GameObject {
+
+  private _dir: Dirs = Dirs.right;
+  private _cells: SnakeCell[] = [];
+
+  constructor(x: number, y: number) {
+    super();
+    this.cells.push(new SnakeCell(x, y));
+  }
+
+  get x(): number { return this.cells[0].x; }
+  get y(): number { return this.cells[0].y; }
+
+  get cells(): SnakeCell[] {
+    return this._cells;
+  }
+  set dir(dir: Dirs) {
+    if (this.length() > 1 && reverseDir(dir) === this._dir) { return; }
+    this._dir = dir;
+  }
+
   onCollision(object: GameObject) {
     if (object instanceof Food) {
       const cells = this.eat(object);
@@ -32,6 +57,11 @@ export class Snake extends GameObject {
     }
     if (object instanceof SnakeCell) {
       this.events.emit('event', new SnakeDied(this));
+      return;
+    }
+    if (object instanceof Rock) {
+      this.events.emit('event', new SnakeDied(this));
+      return;
     }
   }
 
@@ -39,25 +69,8 @@ export class Snake extends GameObject {
     this.move();
   }
 
-  constructor(x: number, y: number) {
-    super();
-    this.cells.push(new SnakeCell(x, y));
-  }
-  private _dir: Dirs = Dirs.right;
-  private _cells: SnakeCell[] = [];
-
-  get x(): number { return this.cells[0].x; }
-  get y(): number { return this.cells[0].y; }
-
   length() {
     return this._cells.length;
-  }
-  get cells(): SnakeCell[] {
-    return this._cells;
-  }
-  set dir(dir: Dirs) {
-    if (this.length() > 1 && reverseDir(dir) === this._dir) { return; }
-    this._dir = dir;
   }
 
   move() {

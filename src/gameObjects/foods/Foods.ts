@@ -1,5 +1,4 @@
-import { EventEmitter } from 'events';
-import {GameObject} from '../GameObject';
+import { GameObject } from '../../GameObject';
 
 export abstract class Food extends GameObject {
 

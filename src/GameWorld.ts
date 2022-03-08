@@ -15,9 +15,8 @@ export class GameWorld {
 
   }
   clear() {
-    for (let i = 0; i < this.objects.length; i++) {
-      this.objects.splice(i, 1);
-    }
+    const objects = [...this.objects];
+    objects.forEach( o => this.removeObject(o) );
   }
 
   removeObject(object: GameObject) {

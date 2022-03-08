@@ -1,20 +1,18 @@
-import { AddedGameObjects, GameEvent, SnakeAteFood, SnakeDied } from './GameEvents';
-import { GameWorld } from './GameWorld';
-import { GameObject } from './GameObject';
-import {Snake} from './Snake';
-import {Dirs, getRandomInt} from './common';
+import { Dirs, getRandomInt } from './common';
 
-import {CanvasRenderServiceImpl} from './render/CanvasRenderService.Impl';
-import {RenderService} from './render/RenderService';
-import {FoodService} from './foods/FoodService';
+import { GameCollisionChecker } from './GameCollisionChecker';
+import { AddedGameObjects, GameEvent, SnakeAteFood, SnakeDied } from './GameEvents';
+import { GameObject } from './GameObject';
+import { FoodService } from './gameObjects/foods/FoodService';
+import { Rock } from './gameObjects/Rock';
+import { GameWorld } from './GameWorld';
+import { Snake } from './Snake';
 
 interface GameSettings {
-   maxTry: number;
-   foodTimeout: { min: number, max: number};
-   size: number;
-   reduceArea: number;
-}
+  cols: number;
+  rows: number;
 
+}
 export enum GameStates {
   play = 'play',
   stop = 'stop',
@@ -22,134 +20,138 @@ export enum GameStates {
 }
 
 export class Game {
-    private readonly gameWorld = new GameWorld();
-    constructor(settings?: GameSettings) {
-      this._settings = {...settings, ...this._settings};
-      this._size = this._settings.size;
-      this._reduceArea  = this._settings.reduceArea / this._size;
-      this._foodService = new FoodService();
+  private readonly _defaultSettings: GameSettings = {
+    cols: 50,
+    rows: 30,
+  };
 
-      window.addEventListener('keydown', (e: KeyboardEvent) => this.arrowControls(e) );
-    }
-    private _snake: Snake;
+  private readonly _checker: GameCollisionChecker;
+  private readonly _gameWorld: GameWorld;
+  private readonly _foodService: FoodService;
+  private _gameTimer: any;
 
-    private _render: RenderService;
-    private _foodService: FoodService;
+  private _snake: Snake;
+  private _state: GameStates = GameStates.stop;
 
-    private _state: GameStates = GameStates.stop;
-    private _reduceArea = 0;
-    private _size: number = 0;
-    private _score: number = 0;
-    private _prevScore: number = 0;
+  private _score: number = 0;
+  private _prevScore: number = 0;
 
-    get snake(): Snake { return this._snake; }
+  private _settings: GameSettings;
 
-    get score(): number { return this._score; }
-    get prevScore(): number { return this._prevScore; }
-    get size(): number { return this._size; }
+  constructor(settings?: GameSettings) {
+    this._settings = { ...settings, ...this._defaultSettings };
+    this._foodService = new FoodService();
+    this._checker = new GameCollisionChecker();
+    this._gameWorld = new GameWorld();
+    this._gameWorld.events.on('event', (event) => this.handleEvent(event));
+  }
 
-    get state(): GameStates { return this._state; }
-    get objects(): GameObject[] { return this.gameWorld.getObjects(); }
-
-    private _settings: GameSettings = {
-        maxTry: 1,
-        foodTimeout: {max: 3, min: 1},
-        size: 16,
-        reduceArea: 112,
+  get snake(): Snake { return this._snake; }
+  get score(): number { return this._score; }
+  get prevScore(): number { return this._prevScore; }
+  get state(): GameStates { return this._state; }
+  get objects(): GameObject[] { return  this._gameWorld.getObjects(); }
+  get size() {
+    return  {
+      cols: this._settings.cols,
+      rows: this._settings.rows,
     };
+  }
 
-    update(): void {
-        this._snake.update(1);
-        this.gameWorld.getObjects().forEach(o => {
-          if (o === this._snake) { return; }
-          if (o.x === this._snake.x && o.y === this._snake.y) { this._snake.onCollision(o);}
-        });
-    }
+  update(): void {
+    this._snake.update(1);
+    this._checker.checkCollisions(this._snake, this._gameWorld.getObjects());
+  }
 
-    render(el: HTMLElement) {
-      this._render = new CanvasRenderServiceImpl(el, this);
-      this._render.render();
-    }
+  newGame() {
+    this._gameWorld.clear();
+    this._state = GameStates.stop;
+    this._score = 0;
 
-    canRestart() {
-      // if (this._try + 1 > this._settings.maxTry) { return false ; }
+    this.addBorders();
+    this.addSnake();
+    this.addFood();
+  }
 
-      return  true;
-    }
+  start() {
+    this._state = GameStates.play;
+    this._gameTimer = setInterval(() => { this.update(); }, 500);
+  }
 
-    newGame() {
-        this.gameWorld.clear();
+  restart() {
+    this.newGame();
+    this.start();
+  }
+  private gameOver() {
+    clearInterval(this._gameTimer);
+    this._state = GameStates.over;
+  }
 
-        this._state = GameStates.stop;
-        this._score = 0;
-        const coords = this.randomCoords();
+  handlerKey(keyCode: number) {
+    const actions = {
+      SnakeUp: () => { this._snake.dir = Dirs.up; },
+      SnakeDown: () => { this._snake.dir = Dirs.down; },
+      SnakeLeft: () => { this._snake.dir = Dirs.left; },
+      SnakeRight: () => { this._snake.dir = Dirs.right; },
+    };
+    const keys = [
+      { codes: [65, 37], action: actions.SnakeLeft },
+      { codes: [68, 39], action: actions.SnakeRight },
+      { codes: [87, 38], action: actions.SnakeUp },
+      { codes: [83, 40], action: actions.SnakeDown },
+    ];
+    const key = keys.find( k => k.codes.includes(keyCode));
+    if (key) { key.action(); this.update(); }
+  }
 
-        this._snake = new Snake(coords.x + 1 , coords.y + 1);
-        this.gameWorld.addObject(this._snake);
-        this.addFood();
-        this.gameWorld.events.on('event', (event) => this.handleEvent(event));
-    }
-
-    start() {
-      if (this._state === GameStates.stop) {
-        this._state = GameStates.play;
-      }
-    }
-
-    restart() {
-      this.newGame();
-      this.start();
-    }
-
-    private gameOver() {
-      this._state = GameStates.over;
-    }
-
-    private addFood() {
+  private addBorders() {
+    this._gameWorld.addObject(new Rock(0, 0, this.size.cols, 1));
+    this._gameWorld.addObject(new Rock(0, 0, 1, this.size.rows));
+    this._gameWorld.addObject(new Rock(this.size.cols - 1, 0, 1, this.size.rows));
+    this._gameWorld.addObject(new Rock(0, this.size.rows - 1, this.size.cols, 1));
+    this._gameWorld.addObject(new Rock(5, 5, 4, 4));
+  }
+  private addFood() {
+    let food;
+    do {
       const coords = this.randomCoords();
-      this.gameWorld.addObject(this._foodService.getFood(coords.x, coords.y));
-    }
+      food = this._foodService.getFood(coords.x, coords.y);
+    } while (this._checker.haveCollisions(food, this._gameWorld.getObjects()));
 
-    private randomCoords() {
-      const coords = {
-         x: 0, // getRandomInt(this._area.x2, this._area.x1),
-         y: 0, // getRandomInt(this._area.y2, this._area.y1),
-      };
-      return coords;
-    }
+    this._gameWorld.addObject(food);
+  }
+  private addSnake() {
+    let snake;
+    do {
+      const coords = this.randomCoords();
+      snake = new Snake(coords.x, coords.y);
+    } while (this._checker.haveCollisions(snake, this._gameWorld.getObjects()));
+    this._snake = snake;
+    this._gameWorld.addObject(this._snake);
+  }
 
-    private randomFoodTimeout() {
-      return getRandomInt(this._settings.foodTimeout.max, this._settings.foodTimeout.min) * 1000;
-    }
+  private randomCoords() {
+    const coords = {
+      x: getRandomInt(this.size.cols - 2, 1),
+      y: getRandomInt(this.size.rows - 2, 1),
+    };
+    return coords;
+  }
 
-    private handleEvent(event: GameEvent) {
-      if (event instanceof SnakeAteFood) {
-        this._score += event.data.food.score;
-        this.gameWorld.removeObject(event.data.food);
-        this.addFood();
-        return;
-      }
-      if (event instanceof AddedGameObjects) {
-        event.data.objects.forEach(o => {
-          this.gameWorld.addObject(o);
-        });
-      }
-      if (event instanceof SnakeDied) {
-        this.gameOver();
-      }
+  private handleEvent(event: GameEvent) {
+    if (event instanceof SnakeAteFood) {
+      this._score += event.data.food.score;
+      this._gameWorld.removeObject(event.data.food);
+      this.addFood();
+      return;
     }
-
-    private arrowControls(e: KeyboardEvent) {
-      const keys = [
-        { codes: [65, 37], dir: Dirs.left },
-        { codes: [87, 38], dir: Dirs.up },
-        { codes: [68, 39], dir: Dirs.right },
-        { codes: [83, 40], dir: Dirs.down },
-      ];
-      const key = keys.find( k => k.codes.includes(e.keyCode));
-      if ( key  && this._state === GameStates.play) {
-          this._snake.dir = key.dir;
-          this.update();
-      }
+    if (event instanceof AddedGameObjects) {
+      event.data.objects.forEach(o => {
+        this._gameWorld.addObject(o);
+      });
     }
+    if (event instanceof SnakeDied) {
+      this.gameOver();
+    }
+  }
 }

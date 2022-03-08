@@ -5,6 +5,8 @@ export class Orange extends Food {
   readonly score: number = 9;
   readonly shape: string = 'circle';
   readonly color: string = this.getRandomColor();
+  readonly width: number = 1;
+  readonly height: number = 1;
 
   private getRandomColor() {
     const letters = '0123456789ABCDEF';

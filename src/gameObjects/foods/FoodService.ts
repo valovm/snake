@@ -1,5 +1,6 @@
+import { getRandomInt } from '../../common';
 import {Food} from './Foods';
-import {getRandomInt} from '../common';
+
 import {Apple} from './Apple';
 import {Orange} from './Orange';
 

@@ -1,5 +1,6 @@
-import { Food } from './foods/Foods';
+
 import {GameObject} from './GameObject';
+import { Food } from './gameObjects/foods/Foods';
 
 export interface GameEvent {
   readonly data?: unknown;

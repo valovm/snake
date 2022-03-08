@@ -5,4 +5,6 @@ export class Apple extends Food {
   readonly score: number = 1;
   readonly color: string = '#ff4157';
   readonly shape: string = 'square';
+  readonly width: number = 1;
+  readonly height: number = 1;
 }
