@@ -8,22 +8,29 @@ var app = new Vue({
     data: {
         game: new Game(),
         gameRender: undefined,
+        bestScore: 0,
+        modalGameOverShow: false
     },
     methods:{
         restart(){
             this.game.restart();
-        },
-        scoreWin() {
-            return this.game.prevScore != undefined && this.game.score > this.game.prevScore;
+            this.modalGameOverShow = false;
         },
         keyDown(event){
             this.game.handlerKey(event.keyCode);
-        }
+        },
+        getBestScore() {
+            const prevScore = this.game.scores.find(s => this.game.score < s);
+            this.bestScore =  prevScore ? prevScore : this.game.score;
+        },
     },
-    computed:{
-        modal(){
-            return this.game.state === 'over';
-        }
+    watch: {
+       'game.state': function (val){
+           if  (val == 'over'){
+               this.getBestScore();
+               this.modalGameOverShow = true;
+           }
+       }
     },
     mounted() {
         window.addEventListener('keydown', (e) => this.keyDown(e) );

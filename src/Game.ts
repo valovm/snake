@@ -34,7 +34,7 @@ export class Game {
   private _state: GameStates = GameStates.stop;
 
   private _score: number = 0;
-  private _prevScore: number = 0;
+  private readonly _scores: number[] = [];
 
   private _settings: GameSettings;
 
@@ -48,7 +48,7 @@ export class Game {
 
   get snake(): Snake { return this._snake; }
   get score(): number { return this._score; }
-  get prevScore(): number { return this._prevScore; }
+  get scores(): number[] { return this._scores; }
   get state(): GameStates { return this._state; }
   get objects(): GameObject[] { return  this._gameWorld.getObjects(); }
   get size() {
@@ -84,10 +84,12 @@ export class Game {
   }
   private gameOver() {
     clearInterval(this._gameTimer);
+    this._scores.push(this._score);
     this._state = GameStates.over;
   }
 
   handlerKey(keyCode: number) {
+    if (this._state !== GameStates.play) { return; }
     const actions = {
       SnakeUp: () => { this._snake.dir = Dirs.up; },
       SnakeDown: () => { this._snake.dir = Dirs.down; },

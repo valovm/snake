@@ -10,13 +10,20 @@
 
   <div id="game"  v-if="game">
     <div class="game-display">
-      <div class="digit">
-        <div class="digit-label">Score</div>
-        <div class="digit-value" :class="{ 'score-win': scoreWin() }">{{ game.score }}</div>
-      </div>
+        <div class="d-flex">
+            <div class="digit" style="width: 100px">
+                <div class="digit-label">Score</div>
+                <div class="digit-value">{{ game.score }}</div>
+            </div>
+            <div class="digit">
+                <div class="digit-label">Best Score</div>
+                <div class="digit-value">{{ bestScore }}</div>
+            </div>
+        </div>
+
       <div ref="game-snake"></div>
 
-      <div class="modal"  v-if="modal">
+      <div class="modal"  v-if="modalGameOverShow">
         <div class="modal-content">
           <div class="modal-title">Game Over</div>
           <div class="game-score digit">
