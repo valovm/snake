@@ -134,8 +134,8 @@ export class Game {
 
   private randomCoords() {
     const coords = {
-      x: getRandomInt(this.size.cols - 2, 1),
-      y: getRandomInt(this.size.rows - 2, 1),
+      x: getRandomInt(this.size.cols - 1, 0),
+      y: getRandomInt(this.size.rows - 1, 0),
     };
     return coords;
   }
